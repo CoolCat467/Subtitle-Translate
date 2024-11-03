@@ -55,7 +55,7 @@ async def translate_texts(
             source_lang,
         )
 
-    new_texts: dict[int, list[str]] = extricate.list_to_dict(keys, new_values)
+    new_texts = extricate.list_to_dict(keys, new_values)
     # Convert back to tuples
     return {k: tuple(v) for k, v in new_texts.items()}
 

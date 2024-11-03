@@ -27,7 +27,7 @@ import json
 import random
 import urllib.request
 from functools import partial
-from typing import TYPE_CHECKING, Any, Final, TypeVar, assert_never
+from typing import TYPE_CHECKING, Any, Final, TypeVar, assert_never, cast
 from urllib.parse import urlencode
 
 import httpx
@@ -115,13 +115,13 @@ def is_url(text: str) -> bool:
 
 
 def translate_sync(
-    sentence: str | int,
+    sentence: str,
     to_lang: str,
     source_lang: str = "auto",
-) -> str | int:
+) -> str:
     """Return sentence translated from source_lang to to_lang."""
-    if isinstance(sentence, int) or is_url(sentence):
-        # skip numbers and URLs
+    if is_url(sentence):
+        # skip URLs
         return sentence
 
     # Get URL from function, which uses urllib to generate proper query
@@ -135,15 +135,15 @@ def translate_sync(
 
 async def get_translated_coroutine(
     client: httpx.AsyncClient,
-    sentence: str | int,
+    sentence: str,
     to_lang: str,
     source_lang: str = "auto",
-) -> str | int:
+) -> str:
     """Return the sentence translated, asynchronously."""
     global AGENT  # pylint: disable=global-statement
 
-    if isinstance(sentence, int) or is_url(sentence):
-        # skip numbers and URLs
+    if is_url(sentence):
+        # skip URLs
         return sentence
     # Make sure we have a timeout, so that in the event of network failures
     # or something code doesn't get stuck
@@ -177,15 +177,18 @@ async def get_translated_coroutine(
 
 async def translate_async(
     client: httpx.AsyncClient,
-    sentences: Sequence[str | int],
+    sentences: Sequence[str],
     to_lang: str,
     source_lang: str,
-) -> list[str | int]:
+) -> list[str]:
     """Translate multiple sentences asynchronously."""
-    coros: list[partial[Awaitable[str | int]]] = [
-        partial(get_translated_coroutine, client, q, to_lang, source_lang)
-        for q in sentences
-    ]
+    coros = cast(
+        "list[partial[Awaitable[str]]]",
+        [
+            partial(get_translated_coroutine, client, q, to_lang, source_lang)
+            for q in sentences
+        ],
+    )
     return await gather(*coros)
 
 

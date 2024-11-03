@@ -1,0 +1,24 @@
+# For tests
+pytest >= 5.0
+coverage >= 7.2.5
+pytest-trio
+pytest-cov
+
+# Tools
+black; implementation_name == "cpython"
+mypy
+ruff >= 0.6.6
+uv >= 0.2.24
+codespell
+
+# https://github.com/python-trio/trio/pull/654#issuecomment-420518745
+mypy-extensions
+typing-extensions
+
+# Types
+types-beautifulsoup4
+
+# Checker's own dependencies
+trio~=0.27.0
+httpx[http2]~=0.27.0
+beautifulsoup4~=4.12.3

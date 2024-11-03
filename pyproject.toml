@@ -35,7 +35,6 @@ dependencies = [
     "trio~=0.27.0",
     "httpx[http2]~=0.27.0",
     "beautifulsoup4~=4.12.3",
-    "types-beautifulsoup4",
 ]
 
 [tool.setuptools.dynamic]
