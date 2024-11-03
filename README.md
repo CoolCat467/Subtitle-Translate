@@ -1,6 +1,7 @@
 # Subtitle-Translate
 Script for translating Subtitle (.srt) files with google translate.
 
+[![CI](https://github.com/CoolCat467/Subtitle-Translate/actions/workflows/ci.yml/badge.svg)](https://github.com/CoolCat467/Subtitle-Translate/actions/workflows/ci.yml)
 <!-- BADGIE TIME -->
 
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/CoolCat467/Subtitle-Translate/main.svg)](https://results.pre-commit.ci/latest/github/CoolCat467/Subtitle-Translate/main)
@@ -67,3 +68,12 @@ values list.
 `agents.py` from https://github.com/Animenosekai/useragents/blob/main/pyuseragents/data/list.py
 is by Anime no Sekai and has a ton of random user agents to use so Google Translate
 doesn't get suspicious of us sending tens of thousands of requests without an API key
+
+
+### Links
+* Source Code - https://github.com/CoolCat467/Subtitle-Translate.git
+* Issues      - https://github.com/CoolCat467/Subtitle-Translate/issues
+
+### License
+-------
+Code and documentation are available according to the GNU General Public License v3.0 (see [LICENSE](https://github.com/CoolCat467/Subtitle-Translate/blob/HEAD/LICENSE)).
