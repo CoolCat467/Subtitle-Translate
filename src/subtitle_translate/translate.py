@@ -101,7 +101,7 @@ def process_response(result: list[str] | list[list[Any]]) -> str:
             raise ValueError(
                 f"Unexpected type {type(part)!r}, expected list or str",
             )
-    assert False, "Unreachable"
+    raise RuntimeError("Unreachable")
 
 
 def is_url(text: str) -> bool:
