@@ -1,0 +1,178 @@
+[build-system]
+requires = ["setuptools >= 64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "subtitle_translate"
+dynamic = ["version"]
+authors = [
+  { name="CoolCat467", email="CoolCat467@duck.com" },
+]
+description = "Utility program for translating subtitle files"
+readme = {file = "README.md", content-type = "text/markdown"}
+license = {file = "LICENSE"}
+requires-python = ">=3.10"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Internet",
+    "Topic :: Utilities",
+    "Operating System :: OS Independent",
+    "Framework :: Trio",
+    "Typing :: Typed",
+]
+keywords = [
+    "subtitle", "translation", "utility",
+]
+dependencies = [
+    "trio~=0.27.0",
+    "httpx[http2]~=0.27.0",
+    "beautifulsoup4~=4.12.3",
+    "types-beautifulsoup4",
+]
+
+[tool.setuptools.dynamic]
+version = {attr = "subtitle_translate.main.__version__"}
+
+[project.urls]
+"Source" = "https://github.com/CoolCat467/Subtitle-Translate"
+"Bug Tracker" = "https://github.com/CoolCat467/Subtitle-Translate/issues"
+
+[project.scripts]
+subtitle_translate = "subtitle_translate.main:cli_run"
+
+[tool.setuptools.package-data]
+subtitle_translate = ["py.typed", "data/*"]
+
+[tool.mypy]
+files = ["src/subtitle_translate/",]
+check_untyped_defs = true
+disallow_any_generics = true
+disallow_untyped_calls = true
+disallow_untyped_defs = true
+ignore_missing_imports = true
+no_implicit_optional = true
+no_implicit_reexport = true
+show_column_numbers = true
+show_error_codes = true
+show_traceback = true
+strict = true
+strict_equality = true
+warn_redundant_casts = true
+warn_return_any = true
+warn_unreachable = true
+warn_unused_configs = true
+warn_unused_ignores = true
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+
+[tool.codespell]
+ignore-words-list = 'astroid,crasher,asend'
+skip = "*/agents.py,*/languages.py,*.srt"
+
+[tool.black]
+line-length = 79
+
+[tool.ruff]
+line-length = 79
+fix = true
+
+include = ["*.py", "*.pyi", "**/pyproject.toml"]
+
+[tool.ruff.lint]
+select = [
+    "A",     # flake8-builtins
+    "ASYNC", # flake8-async
+    "B",     # flake8-bugbear
+    "C4",    # flake8-comprehensions
+    "COM",   # flake8-commas
+    "D",     # pydocstyle
+    "E",     # Error
+    "EXE",   # flake8-executable
+    "F",     # pyflakes
+    "FA",    # flake8-future-annotations
+    "FLY",   # flynt
+    "FURB",  # refurb
+    "I",     # isort
+    "ICN",   # flake8-import-conventions
+    "N",     # pep8-naming
+    "PIE",   # flake8-pie
+    "PT",    # flake8-pytest-style
+    "PYI",   # flake8-pyi
+    "Q",     # flake8-quotes
+    "R",     # Refactor
+    "RET",   # flake8-return
+    "RUF",   # Ruff-specific rules
+    "S",     # flake8-bandit
+    "SIM",   # flake8-simplify
+    "SLOT",  # flake8-slots
+    "TCH",   # flake8-type-checking
+    "UP",    # pyupgrade
+    "W",     # Warning
+    "YTT",   # flake8-2020
+]
+extend-ignore = [
+    "D203",   # one-blank-line-before-class
+    "D204",   # one-blank-line-after-class
+    "D211",   # no-blank-line-before-class
+    "D213",   # multi-line-summary-second-line
+    "D417",   # undocumented-param "Missing argument descriptions"
+    "E501",   # line-too-long
+    "PYI041", # redundant-numeric-union
+    "S101",   # assert (use of assert for tests and type narrowing)
+    "SIM117", # multiple-with-statements
+]
+
+[tool.ruff.lint.per-file-ignores]
+"src/subtitle_translate/agents.py" = [
+    "E501",  # line-too-long
+]
+"tests/*" = [
+    "D100",  # undocumented-public-module
+    "D103",  # undocumented-public-function
+    "D107",  # undocumented-public-init
+]
+
+[tool.pytest.ini_options]
+addopts = "--cov-report=xml --cov-report=term-missing --cov=subtitle_translate"
+testpaths = [
+    "tests",
+]
+
+[tool.coverage.run]
+branch = true
+source_pkgs = ["subtitle_translate"]
+omit = [
+    "__init__.py",
+]
+
+[tool.coverage.report]
+precision = 1
+skip_covered = true
+exclude_also = [
+    "pragma: no cover",
+    "abc.abstractmethod",
+    "if TYPE_CHECKING.*:",
+    "if _t.TYPE_CHECKING:",
+    "if t.TYPE_CHECKING:",
+    "@overload",
+    'class .*\bProtocol\b.*\):',
+    "raise NotImplementedError",
+]
+partial_branches = [
+    "pragma: no branch",
+    "if not TYPE_CHECKING:",
+    "if not _t.TYPE_CHECKING:",
+    "if not t.TYPE_CHECKING:",
+    "if .* or not TYPE_CHECKING:",
+    "if .* or not _t.TYPE_CHECKING:",
+    "if .* or not t.TYPE_CHECKING:",
+]
