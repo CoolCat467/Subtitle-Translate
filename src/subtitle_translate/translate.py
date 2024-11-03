@@ -27,7 +27,7 @@ import json
 import random
 import urllib.request
 from functools import partial
-from typing import TYPE_CHECKING, Any, Final, TypeVar, assert_never, cast
+from typing import TYPE_CHECKING, Any, Final, TypeVar, cast
 from urllib.parse import urlencode
 
 import httpx
@@ -101,7 +101,7 @@ def process_response(result: list[str] | list[list[Any]]) -> str:
             raise ValueError(
                 f"Unexpected type {type(part)!r}, expected list or str",
             )
-    assert_never()
+    assert False, "Unreachable"
 
 
 def is_url(text: str) -> bool:
