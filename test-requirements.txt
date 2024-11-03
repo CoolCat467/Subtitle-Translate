@@ -52,6 +52,8 @@ idna==3.10
     #   trio
 iniconfig==2.0.0
     # via pytest
+lxml==5.3.0
+    # via -r test-requirements.in
 mypy==1.13.0
     # via -r test-requirements.in
 mypy-extensions==1.0.0
