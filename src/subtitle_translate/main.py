@@ -60,7 +60,7 @@ async def translate_texts(
     return {k: tuple(v) for k, v in new_texts.items()}
 
 
-async def translate_subtiles(
+async def translate_subtitles(
     source_file: str,
     dest_file: str,
     source_language: str = "auto",
@@ -77,8 +77,8 @@ async def translate_subtiles(
     print("Translating...")
     new_texts = await translate_texts(texts, source_language, dest_language)
 
-    sentance_count = sum(map(len, texts.values()))
-    print(f"Translated {sentance_count} sentences.")
+    sentence_count = sum(map(len, texts.values()))
+    print(f"Translated {sentence_count} sentences.")
 
     print("Updating subtitle texts...")
     subs = subtitle_parser.modify_subtitles(subs, new_texts)
@@ -141,7 +141,7 @@ async def run_async() -> None:
         name, ext = args.source_file.rsplit(".", 1)
         args.dest_file = f"{name}.{args.dest_lang}.{ext}"
 
-    await translate_subtiles(
+    await translate_subtitles(
         args.source_file,
         args.dest_file,
         args.source_lang,
