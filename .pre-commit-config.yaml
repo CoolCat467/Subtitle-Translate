@@ -2,7 +2,7 @@ ci:
   autofix_prs: true
   autoupdate_schedule: quarterly
   submodules: false
-  skip: [badgie, project-requirements]
+  skip: [badgie]
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -50,7 +50,7 @@ repos:
     hooks:
       - id: project-requirements
         name: regenerate requirements.in
-        language: system
-        entry: python tools/project_requirements.py
+        language: python
+        entry: tools/project_requirements.py
         pass_filenames: false
         files: ^(test-requirements.in)|(pyproject.toml)$
