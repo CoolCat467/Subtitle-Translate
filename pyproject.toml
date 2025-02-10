@@ -55,6 +55,7 @@ tools = [
     'black>=24.10.0; implementation_name == "cpython"',
     "ruff>=0.9.2",
     "codespell>=2.3.0",
+    "mypy>=1.15.0",
 ]
 
 [project.urls]
