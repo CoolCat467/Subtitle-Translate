@@ -28,6 +28,7 @@ repos:
       - id: ruff
         types: [file]
         types_or: [python, pyi, toml]
+        args: ["--show-fixes"]
   - repo: https://github.com/CoolCat467/badgie
     rev: v0.9.6
     hooks:
@@ -46,11 +47,3 @@ repos:
     rev: v1.3.1
     hooks:
       - id: zizmor
-  - repo: local
-    hooks:
-      - id: project-requirements
-        name: regenerate requirements.in
-        language: python
-        entry: tools/project_requirements.py
-        pass_filenames: false
-        files: ^(test-requirements.in)|(pyproject.toml)$

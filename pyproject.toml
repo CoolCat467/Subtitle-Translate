@@ -35,11 +35,27 @@ dependencies = [
     "trio~=0.28.0",
     "httpx[http2]~=0.28.1",
     "beautifulsoup4~=4.12.3",
-    "lxml>=5.3.0"
+    "lxml>=5.3.0",
+    "orjson>=3.10.15",
 ]
 
 [tool.setuptools.dynamic]
 version = {attr = "subtitle_translate.main.__version__"}
+
+[project.optional-dependencies]
+user = ["idleuserextend~=0.0.1"]
+tests = [
+    "pytest>=5.0",
+    "pytest-cov>=6.0.0",
+    "pytest-trio>=0.8.0",
+    "coverage>=7.2.5",
+    "uv>=0.5.21",
+]
+tools = [
+    'black>=24.10.0; implementation_name == "cpython"',
+    "ruff>=0.9.2",
+    "codespell>=2.3.0",
+]
 
 [project.urls]
 "Source" = "https://github.com/CoolCat467/Subtitle-Translate"
@@ -51,31 +67,21 @@ subtitle_translate = "subtitle_translate.main:cli_run"
 [tool.setuptools.package-data]
 subtitle_translate = ["py.typed"]
 
+[tool.uv]
+package = true
+
 [tool.mypy]
 files = ["src/subtitle_translate/",]
-check_untyped_defs = true
-disallow_any_decorated = true
-disallow_any_generics = true
-disallow_any_unimported = true
-disallow_incomplete_defs = true
-disallow_subclassing_any = true
-disallow_untyped_calls = true
-disallow_untyped_decorators = true
-disallow_untyped_defs = true
-ignore_missing_imports = true
-local_partial_types = true
-no_implicit_optional = true
-no_implicit_reexport = true
 show_column_numbers = true
 show_error_codes = true
 show_traceback = true
+disallow_any_decorated = true
+disallow_any_unimported = true
+ignore_missing_imports = true
+local_partial_types = true
+no_implicit_optional = true
 strict = true
-strict_equality = true
-warn_redundant_casts = true
-warn_return_any = true
 warn_unreachable = true
-warn_unused_configs = true
-warn_unused_ignores = true
 
 [tool.ruff.lint.isort]
 combine-as-imports = true
