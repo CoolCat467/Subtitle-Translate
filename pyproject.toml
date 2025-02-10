@@ -168,6 +168,9 @@ source_pkgs = ["subtitle_translate"]
 omit = [
     "__init__.py",
 ]
+parallel = true
+relative_files = true
+source = ["."]
 
 [tool.coverage.report]
 precision = 1
