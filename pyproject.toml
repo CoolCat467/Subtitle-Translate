@@ -32,7 +32,7 @@ keywords = [
     "subtitle", "translation", "utility",
 ]
 dependencies = [
-    "trio~=0.28.0",
+    "trio~=0.29.0",
     "httpx[http2]~=0.28.1",
     "beautifulsoup4~=4.12.3",
     "lxml>=5.3.0",
