@@ -23,6 +23,7 @@ __author__ = "CoolCat467"
 __license__ = "GNU General Public License Version 3"
 
 
+import html
 import json
 import random
 from functools import partial
@@ -174,6 +175,16 @@ def is_url(text: str) -> bool:
 ##            raise
 
 
+def escape_text_html(text: str) -> str:
+    """Escape HTML entities for request."""
+    return html.escape(text)
+
+
+def unescape_html_entities(text: str) -> str:
+    """Unescape HTML entities from response."""
+    return html.unescape(text)
+
+
 async def get_translated_coroutine(
     client: httpx.AsyncClient,
     sentence: str,
@@ -198,6 +209,7 @@ async def get_translated_coroutine(
     }
 
     sentence = sentence.replace("\n", "<br>")
+    sentence = escape_text_html(sentence)
 
     raw_content = [[[sentence], source_lang, to_lang], "wt_lib"]
     content = orjson.dumps(raw_content)
@@ -208,7 +220,9 @@ async def get_translated_coroutine(
             response = await client.post(url, content=content, headers=headers)
             # Wait for our response and make it json so we can look at
             # it like a dictionary
-            return process_response(response.json()).replace("<br>", "\n")
+            return unescape_html_entities(
+                process_response(response.json()).replace("<br>", "\n"),
+            )
         except httpx.ConnectTimeout:
             pass
         except json.decoder.JSONDecodeError:

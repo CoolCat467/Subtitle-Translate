@@ -31,7 +31,7 @@ from typing import IO, TYPE_CHECKING, Final, NamedTuple
 from bs4 import BeautifulSoup
 
 if TYPE_CHECKING:
-    from collections.abc import Generator
+    from collections.abc import Generator, Iterable
 
 
 # Default text tags
@@ -67,7 +67,7 @@ class Subtitle(NamedTuple):
     html: str
 
 
-def parse_timestamp(timestamp: str) -> int:
+def parse_timestamp_srt(timestamp: str) -> int:
     """Parse timestamp. Return milliseconds."""
     r_h, r_m, r_s_ms = timestamp.split(":", 2)
     h = int(r_h)
@@ -78,7 +78,12 @@ def parse_timestamp(timestamp: str) -> int:
     return h * 3600000 + m * 60000 + s * 1000 + ms
 
 
-def time_to_timestamp(time_: int) -> str:
+def parse_timestamp_vtt(timestamp: str) -> int:
+    """Parse timestamp. Return milliseconds."""
+    return parse_timestamp_srt(timestamp.replace(".", ",", 1))
+
+
+def time_to_timestamp_srt(time_: int) -> str:
     """Return timestamp from given time."""
     h, time_ = divmod(time_, 3600000)
     m, time_ = divmod(time_, 60000)
@@ -86,21 +91,40 @@ def time_to_timestamp(time_: int) -> str:
     return f"{h:02}:{m:02}:{s:02},{ms:03}"
 
 
-def parse_time_fragment(time_fragment: str) -> tuple[int, int]:
+def time_to_timestamp_vtt(time_: int) -> str:
+    """Return timestamp from given time."""
+    return time_to_timestamp_srt(time_).replace(",", ".", 1)
+
+
+def parse_time_fragment_srt(time_fragment: str) -> tuple[int, int]:
     """Parse time fragment."""
     raw_start, raw_end = time_fragment.split(" --> ", 1)
-    return parse_timestamp(raw_start), parse_timestamp(raw_end)
+    return parse_timestamp_srt(raw_start), parse_timestamp_srt(raw_end)
 
 
-def duration_to_fragment(duration: tuple[int, int]) -> str:
+def parse_time_fragment_vtt(time_fragment: str) -> tuple[int, int]:
+    """Parse time fragment."""
+    raw_start, raw_end = time_fragment.split(" --> ", 1)
+    return parse_timestamp_vtt(raw_start), parse_timestamp_vtt(raw_end)
+
+
+def duration_to_srt_fragment(duration: tuple[int, int]) -> str:
     """Return time fragment from duration."""
     start, end = duration
-    start_str = time_to_timestamp(start)
-    end_str = time_to_timestamp(end)
+    start_str = time_to_timestamp_srt(start)
+    end_str = time_to_timestamp_srt(end)
     return f"{start_str} --> {end_str}"
 
 
-def parse_subtitle_text(
+def duration_to_vtt_fragment(duration: tuple[int, int]) -> str:
+    """Return time fragment from duration."""
+    start, end = duration
+    start_str = time_to_timestamp_vtt(start)
+    end_str = time_to_timestamp_vtt(end)
+    return f"{start_str} --> {end_str}"
+
+
+def parse_subtitle_text_srt(
     file: IO[str],
 ) -> Generator[tuple[int, Subtitle], None, None]:
     """Yield subtitle id and subtitles from file."""
@@ -115,7 +139,7 @@ def parse_subtitle_text(
             mode += 1
         elif mode == 1:  # Read duration
             raw_time_fragment = line
-            time_fragment = parse_time_fragment(raw_time_fragment)
+            time_fragment = parse_time_fragment_srt(raw_time_fragment)
             mode += 1
         elif mode == 2:  # Read HTML until blank line
             if line:
@@ -127,28 +151,92 @@ def parse_subtitle_text(
     assert not html, "Missing newline after subtitle HTML"
 
 
-def write_subtitles(file: IO[str], subs: dict[int, Subtitle]) -> None:
+def parse_subtitle_text_vtt(
+    file: Iterable[str],
+) -> Generator[Subtitle, None, None]:
+    """Yield subtitles from vtt file.
+
+    File must already have parsed header information.
+    """
+    mode = 0
+    time_fragment: tuple[int, int] = (0, 0)
+    html: str = ""
+    for line in file:
+        line = line.strip()
+        if mode == 0:  # Read duration
+            raw_time_fragment = line
+            time_fragment = parse_time_fragment_vtt(raw_time_fragment)
+            mode += 1
+        elif mode == 1:  # Read HTML until blank line
+            if line:
+                html += f"{line}\n"
+            else:  # Hit blank line
+                mode = 0
+                yield Subtitle(time_fragment, html[:-1])
+                html = ""
+    assert not html, "Missing newline after subtitle HTML"
+
+
+def write_subtitles_srt(file: IO[str], subs_map: dict[int, Subtitle]) -> None:
     """Write subtitles to file."""
-    for subtitle_id, subtitle in subs.items():
+    for subtitle_id, subtitle in subs_map.items():
         file.write(f"{subtitle_id}\n")
-        file.write(f"{duration_to_fragment(subtitle.duration)}\n")
+        file.write(f"{duration_to_srt_fragment(subtitle.duration)}\n")
         file.write(f"{subtitle.html}\n\n")
 
 
-def parse_file(filepath: str) -> Generator[tuple[int, Subtitle], None, None]:
+def write_subtitles_vtt(file: IO[str], subs: Iterable[Subtitle]) -> None:
+    """Write subtitles to file.
+
+    Does not handle writing file header.
+    """
+    for subtitle in subs:
+        file.write(f"{duration_to_vtt_fragment(subtitle.duration)}\n")
+        file.write(f"{subtitle.html}\n\n")
+
+
+def parse_file_srt(
+    filepath: str,
+) -> Generator[tuple[int, Subtitle], None, None]:
     """Yield subtitle id and subtitle from given filepath."""
     with open(filepath, encoding="utf-8") as fp:
-        yield from parse_subtitle_text(fp)
+        yield from parse_subtitle_text_srt(fp)
 
 
-def write_subtitles_file(filepath: str, subs: dict[int, Subtitle]) -> None:
+def parse_file_vtt(
+    filepath: str,
+) -> Generator[list[str] | Subtitle, None, None]:
+    """Yield file header, then subtitle id and subtitle from given filepath."""
+    with open(filepath, encoding="utf-8") as fp:
+        header: list[str] = []
+        for line in fp:
+            stripped = line.strip()
+            if not stripped:
+                break
+            header.append(stripped)
+        yield header
+        yield from parse_subtitle_text_vtt(fp)
+
+
+def write_subtitles_srt_file(filepath: str, subs: dict[int, Subtitle]) -> None:
     """Write subs to given filepath."""
     with open(filepath, "w", encoding="utf-8") as fp:
-        write_subtitles(fp, subs)
+        write_subtitles_srt(fp, subs)
+
+
+def write_subtitles_vtt_file(
+    filepath: str,
+    header: Iterable[str],
+    subs: Iterable[Subtitle],
+) -> None:
+    """Write subs to given filepath."""
+    with open(filepath, "w", encoding="utf-8") as fp:
+        fp.write("\n".join(header) + "\n\n")
+        write_subtitles_vtt(fp, subs)
 
 
 def convert_text(
-    gen: Generator[tuple[int, Subtitle], None, None],
+    gen: Iterable[tuple[int, Subtitle]],
     text_tags: tuple[str, ...] = TEXT_TAGS,
 ) -> tuple[dict[int, Subtitle], dict[int, tuple[str, ...]]]:
     """Read subtitle generator and return subs dictionary and text data."""
@@ -207,25 +295,48 @@ def modify_subtitles(
     return subs
 
 
+def modify_subtitles_plain(
+    subs: dict[int, Subtitle],
+    new_texts: dict[int, tuple[str, ...]],
+) -> dict[int, Subtitle]:
+    """Rewrite subtitle to use new text."""
+    for subtitle_id, subtitle in subs.items():
+        new_text_data = new_texts.get(subtitle_id)
+        # Ignore if not exist
+        if new_text_data is None:
+            continue
+        # Overwrite subtitle
+        subs[subtitle_id] = subtitle._replace(html=new_text_data[0])
+    return subs
+
+
 def run() -> None:
     """Run program."""
-    # subs_gen = parse_file("<filename>.srt")
+    # subs_gen = parse_file_srt("<filename>.srt")
     from io import StringIO
 
+    ##    file = StringIO(
+    ##        """1
+    ##00:00:00,000 --> 24:00:00,000
+    ##<b>This is a 24-hour long subtitle text.</b>
+    ##
+    ##""",
+    ##    )
+    ##    subs_gen = parse_subtitle_text_srt(file)
     file = StringIO(
-        """1
-00:00:00,000 --> 24:00:00,000
-<b>This is a 24-hour long subtitle text.</b>
+        """00:00:00.000 --> 24:00:00.000
+This is a 24-hour long subtitle text.
 
 """,
     )
-    subs_gen = parse_subtitle_text(file)
-    subs, texts = convert_text(subs_gen)
+    subs_gen = parse_subtitle_text_vtt(file)
+    subs, texts = convert_text(enumerate(subs_gen))
     print("\n".join(f"{k}: {v}" for k, v in texts.items()))
     print(f"Parsed {len(subs)} subtitles")
-    subs = modify_subtitles(subs, texts)
+    ##    subs = modify_subtitles(subs, texts)
+    subs = modify_subtitles_plain(subs, texts)
     out_file = StringIO()
-    write_subtitles(out_file, subs)
+    write_subtitles_vtt(out_file, subs.values())
     print("Saved.\n--------------")
     print(out_file.getvalue())
     print("--------------")
