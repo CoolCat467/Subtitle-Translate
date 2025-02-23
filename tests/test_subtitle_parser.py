@@ -3,44 +3,50 @@ from io import StringIO
 from subtitle_translate.subtitle_parser import (
     Subtitle,
     convert_text,
-    duration_to_fragment,
+    duration_to_srt_fragment,
     modify_subtitles,
-    parse_subtitle_text,
-    parse_time_fragment,
-    parse_timestamp,
-    time_to_timestamp,
-    write_subtitles,
+    parse_subtitle_text_srt,
+    parse_time_fragment_srt,
+    parse_timestamp_srt,
+    time_to_timestamp_srt,
+    write_subtitles_srt,
 )
 
 
-def test_parse_timestamp() -> None:
-    assert parse_timestamp("00:01:30,500") == 90500
-    assert parse_timestamp("01:00:00,000") == 3600000
-    assert parse_timestamp("00:00:00,000") == 0
+def test_parse_timestamp_srt() -> None:
+    assert parse_timestamp_srt("00:01:30,500") == 90500
+    assert parse_timestamp_srt("01:00:00,000") == 3600000
+    assert parse_timestamp_srt("00:00:00,000") == 0
 
 
-def test_time_to_timestamp() -> None:
-    assert time_to_timestamp(90050) == "00:01:30,050"
-    assert time_to_timestamp(3600000) == "01:00:00,000"
-    assert time_to_timestamp(0) == "00:00:00,000"
+def test_time_to_timestamp_srt() -> None:
+    assert time_to_timestamp_srt(90050) == "00:01:30,050"
+    assert time_to_timestamp_srt(3600000) == "01:00:00,000"
+    assert time_to_timestamp_srt(0) == "00:00:00,000"
 
 
-def test_parse_time_fragment() -> None:
-    assert parse_time_fragment("00:00:00,000 --> 00:00:05,000") == (0, 5000)
-    assert parse_time_fragment("00:01:00,000 --> 00:01:05,000") == (
+def test_parse_time_fragment_srt() -> None:
+    assert parse_time_fragment_srt("00:00:00,000 --> 00:00:05,000") == (
+        0,
+        5000,
+    )
+    assert parse_time_fragment_srt("00:01:00,000 --> 00:01:05,000") == (
         60000,
         65000,
     )
 
 
-def test_duration_to_fragment() -> None:
-    assert duration_to_fragment((0, 5000)) == "00:00:00,000 --> 00:00:05,000"
+def test_duration_to_srt_fragment() -> None:
     assert (
-        duration_to_fragment((60000, 65000)) == "00:01:00,000 --> 00:01:05,000"
+        duration_to_srt_fragment((0, 5000)) == "00:00:00,000 --> 00:00:05,000"
+    )
+    assert (
+        duration_to_srt_fragment((60000, 65000))
+        == "00:01:00,000 --> 00:01:05,000"
     )
 
 
-def test_parse_subtitle_text() -> None:
+def test_parse_subtitle_text_srt() -> None:
     subtitle_data = StringIO(
         """1
 00:00:00,000 --> 00:00:05,000
@@ -56,17 +62,17 @@ def test_parse_subtitle_text() -> None:
         1: Subtitle((0, 5000), "<b>This is a subtitle.</b>"),
         2: Subtitle((5000, 10000), "<p>Another subtitle.</p>"),
     }
-    result = dict(parse_subtitle_text(subtitle_data))
+    result = dict(parse_subtitle_text_srt(subtitle_data))
     assert result == expected
 
 
-def test_write_subtitles():
+def test_write_subtitles_srt():
     subs = {
         1: Subtitle((0, 5000), "<b>This is a subtitle.</b>"),
         2: Subtitle((5000, 10000), "<p>Another subtitle.</p>"),
     }
     output = StringIO()
-    write_subtitles(output, subs)
+    write_subtitles_srt(output, subs)
     expected_output = (
         "1\n00:00:00,000 --> 00:00:05,000\n<b>This is a subtitle.</b>\n\n"
         "2\n00:00:05,000 --> 00:00:10,000\n<p>Another subtitle.</p>\n\n"
