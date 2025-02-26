@@ -1,5 +1,5 @@
 # Subtitle-Translate
-Script for translating Subtitle (.srt) files with google translate.
+Script for translating Subtitle (.srt and .vtt) files with google translate.
 
 [![CI](https://github.com/CoolCat467/Subtitle-Translate/actions/workflows/ci.yml/badge.svg)](https://github.com/CoolCat467/Subtitle-Translate/actions/workflows/ci.yml)
 <!-- BADGIE TIME -->
@@ -24,12 +24,15 @@ ffmpeg -i Movie.mkv -map 0:s:0 subtitles.srt
 ```
 You might need to change the last 0 if there is more than one subtitle
 track in your file.
+This script also supports `.vtt` files as of v0.1.0.
 Please note that this will absolutely not work at all if your video file
 does have a baked-in subtitle track!
 
 ```console
 > subtitle_translate
-usage: subtitle_translate [-h] [--version] [--source-lang SOURCE_LANG] [--dest-lang DEST_LANG] [--dest-file DEST_FILE] source_file
+usage: subtitle_translate [-h] [--version] [--source-lang SOURCE_LANG] [--source-type SOURCE_TYPE] [--dest-lang DEST_LANG]
+                          [--dest-file DEST_FILE]
+                          source_file
 
 Translate subtitles from one language to another.
 
@@ -42,6 +45,8 @@ options:
   --source-lang SOURCE_LANG
                     The language of the source subtitles (default: 'auto'). Must be a ISO 639-1:2002 language code or 'auto' to
                     guess.
+  --source-type SOURCE_TYPE
+                    Subtitle source type (default: 'auto'). Must be either 'srt' or 'vtt', or 'auto' to guess from filename.
   --dest-lang DEST_LANG
                     The language to translate the subtitles to (default: 'en'). Must be a ISO 639-1:2002 language code.
   --dest-file DEST_FILE
