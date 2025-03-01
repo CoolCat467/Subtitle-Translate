@@ -28,6 +28,24 @@ This script also supports `.vtt` files as of v0.1.0.
 Please note that this will absolutely not work at all if your video file
 does have a baked-in subtitle track!
 
+### Example
+Say `subtitles.srt` is in French, but you want it to be English. In that case, run
+```bash
+subtitle_translate --source-lang fr subtitles.srt
+```
+which will create `subtitles.en.srt` in the current working directory because we didn't specify `--dest-file` and it used the default
+output filename formatting.
+
+Another example, say `subtitles.ko.vtt` is in Korean but you want it in English.
+```bash
+subtitle_translate subtitles.ko.vtt
+```
+which will create `subtitles.en.vtt` in the current working directory, because in `vtt` processing mode it's smarter and
+reads the `Language: ko` tag from the file header and knows it's in Korean. Reminder, if `--source-lang` not specified and can't
+find language from file header if in `vtt` mode, it will default to `auto` and have google translate guess what the source
+language is, which while it works might not be as accurate.
+
+### Command Help Information
 ```console
 > subtitle_translate
 usage: subtitle_translate [-h] [--version] [--source-lang SOURCE_LANG] [--source-type SOURCE_TYPE] [--dest-lang DEST_LANG]
