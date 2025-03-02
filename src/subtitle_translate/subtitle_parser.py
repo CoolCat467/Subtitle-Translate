@@ -174,7 +174,7 @@ def parse_subtitle_text_vtt(
                 mode = 0
                 yield Subtitle(time_fragment, html[:-1])
                 html = ""
-    assert not html, "Missing newline after subtitle HTML"
+    assert not html, "Missing newline after subtitle content"
 
 
 def write_subtitles_srt(file: IO[str], subs_map: dict[int, Subtitle]) -> None:
