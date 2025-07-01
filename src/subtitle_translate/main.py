@@ -27,11 +27,11 @@ __license__ = "GNU General Public License Version 3"
 
 
 import argparse
-import json
 import sys
 from typing import TYPE_CHECKING
 
 import httpx
+import orjson
 import trio
 
 from subtitle_translate import extricate, subtitle_parser, translate
@@ -172,8 +172,8 @@ async def translate_json(
 
     print(f"Loading subtitles file {source_file!r}...")
 
-    async with await trio.open_file(source_file, encoding="utf-8") as fp:
-        texts = json.loads(await fp.read())
+    async with await trio.open_file(source_file, "rb") as fp:
+        texts = orjson.loads(await fp.read())
 
     # Need keys and values to be separated so we can translate only the
     # values and not the keys.
@@ -194,12 +194,11 @@ async def translate_json(
 
     new_texts = extricate.list_to_dict(keys, new_values)
 
-    sentence_count = sum(map(len, new_texts.values()))
-    print(f"Translated {sentence_count} sentences.")
+    print(f"Translated {len(new_values)} sentences.")
 
     print("Saving...")
-    async with await trio.open_file(dest_file, "w", encoding="utf-8") as fp:
-        await fp.write(json.dumps(new_texts, indent=2))
+    async with await trio.open_file(dest_file, "wb") as fp:
+        await fp.write(orjson.dumps(new_texts, option=orjson.OPT_INDENT_2))
     print("Save complete.")
     print(f"Saved to {dest_file!r}")
 
