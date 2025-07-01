@@ -27,9 +27,9 @@ __license__ = "GNU General Public License Version 3"
 
 
 import argparse
+import json
 import sys
 from typing import TYPE_CHECKING
-import json
 
 import httpx
 import trio
