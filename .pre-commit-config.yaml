@@ -41,7 +41,7 @@ repos:
         additional_dependencies:
           - tomli
   - repo: https://github.com/adhtruong/mirrors-typos
-    rev: v1.33.1
+    rev: v1.34.0
     hooks:
       - id: typos
   - repo: https://github.com/woodruffw/zizmor-pre-commit

@@ -29,6 +29,7 @@ __license__ = "GNU General Public License Version 3"
 import argparse
 import sys
 from typing import TYPE_CHECKING
+import json
 
 import httpx
 import trio
@@ -99,6 +100,8 @@ async def translate_subtitles_srt(
     print(f"Loading subtitles file {source_file!r}...")
     subs, new_texts = await translate_subtitles(
         subtitle_parser.parse_file_srt(source_file),
+        source_language=source_language,
+        dest_language=dest_language,
     )
 
     print("Updating subtitle texts...")
@@ -155,6 +158,52 @@ async def translate_subtitles_vtt(
     print(f"Saved to {dest_file!r}")
 
 
+async def translate_json(
+    source_file: str,
+    dest_file: str | None = None,
+    source_language: str = "auto",
+    dest_language: str = "en",
+) -> None:
+    """Translate subtitles file asynchronously."""
+    # Set destination if not provided
+    if dest_file is None:
+        name, ext = source_file.rsplit(".", 1)
+        dest_file = f"{name}.{dest_language}.{ext}"
+
+    print(f"Loading subtitles file {source_file!r}...")
+
+    async with await trio.open_file(source_file, encoding="utf-8") as fp:
+        texts = json.loads(await fp.read())
+
+    # Need keys and values to be separated so we can translate only the
+    # values and not the keys.
+    # Values have to be lists for extricate as of writing.
+    keys, values = extricate.dict_to_list(texts)
+
+    print(f"Parsed {len(keys)} subtitles")
+
+    print("Translating...")
+
+    async with httpx.AsyncClient(http2=True) as client:
+        new_values = await translate.translate_async(
+            client,
+            values,
+            dest_language,
+            source_language,
+        )
+
+    new_texts = extricate.list_to_dict(keys, new_values)
+
+    sentence_count = sum(map(len, new_texts.values()))
+    print(f"Translated {sentence_count} sentences.")
+
+    print("Saving...")
+    async with await trio.open_file(dest_file, "w", encoding="utf-8") as fp:
+        await fp.write(json.dumps(new_texts, indent=2))
+    print("Save complete.")
+    print(f"Saved to {dest_file!r}")
+
+
 async def run_async() -> None:
     """Run program asynchronously."""
     parser = argparse.ArgumentParser(
@@ -191,7 +240,7 @@ async def run_async() -> None:
         default="auto",
         help=(
             "Subtitle source type (default: 'auto').\n"
-            "Must be either 'srt' or 'vtt', or 'auto' to guess from filename."
+            "Must be either 'srt' or 'vtt', 'json', or 'auto' to guess from filename."
         ),
     )
     parser.add_argument(
@@ -224,6 +273,13 @@ async def run_async() -> None:
         )
     elif args.source_type == "vtt":
         await translate_subtitles_vtt(
+            args.source_file,
+            args.dest_file,
+            args.source_lang,
+            args.dest_lang,
+        )
+    elif args.source_type == "json":
+        await translate_json(
             args.source_file,
             args.dest_file,
             args.source_lang,
