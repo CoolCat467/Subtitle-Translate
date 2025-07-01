@@ -12,7 +12,7 @@ Script for translating Subtitle (.srt and .vtt) files with google translate.
 
 ## Installation
 ```console
-pip install git+https://github.com/CoolCat467/Localization-Translation-Utility.git
+pip install git+https://github.com/CoolCat467/Subtitle-Translate.git
 ```
 
 ## Usage
