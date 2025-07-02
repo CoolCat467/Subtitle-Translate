@@ -52,17 +52,17 @@ def combine_end(data: Iterable[str], end: str = "and") -> str:
 
 
 TYPE_CHAR: Final = {
-    "str": "!",
-    "int": "@",
-    "float": "#",
-    "bool": "$",
-    "dict": "%",
-    "list": "^",
-    "NoneType": "&",
+    "str": "\x01",
+    "int": "\x02",
+    "float": "\x03",
+    "bool": "\x04",
+    "dict": "\x05",
+    "list": "\x06",
+    "NoneType": "\x07",
 }
 CHAR_TYPE: Final = {v: k for k, v in TYPE_CHAR.items()}
 
-SEP: Final = "*"
+SEP: Final = "\x00"
 
 
 def dict_to_list(data: Any) -> tuple[list[str], list[str]]:
@@ -78,7 +78,7 @@ def dict_to_list(data: Any) -> tuple[list[str], list[str]]:
                 assert isinstance(data, dict)  # Mypy doesn't understand
                 # If empty dict
                 if not data:
-                    keys.append(wrap_quotes(f"{SEP}", TYPE_CHAR[dtype]))
+                    keys.append(wrap_quotes(SEP, TYPE_CHAR[dtype]))
                     values.append("")
                 # Will not run if no data to enumerate
                 for key, value in data.items():
