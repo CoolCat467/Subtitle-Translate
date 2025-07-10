@@ -32,9 +32,9 @@ keywords = [
     "subtitle", "translation", "utility",
 ]
 dependencies = [
-    "trio~=0.29.0",
-    "httpx[http2]~=0.28.1",
-    "beautifulsoup4~=4.12.3",
+    "trio>=0.30.0",
+    "httpx[http2]>=0.28.1",
+    "beautifulsoup4>=4.12.3",
     "lxml>=5.3.0",
     "orjson>=3.10.15",
 ]
@@ -43,7 +43,6 @@ dependencies = [
 version = {attr = "subtitle_translate.main.__version__"}
 
 [project.optional-dependencies]
-user = ["idleuserextend~=0.0.1"]
 tests = [
     "pytest>=5.0",
     "pytest-cov>=6.0.0",
@@ -52,10 +51,11 @@ tests = [
     "uv>=0.5.21",
 ]
 tools = [
-    'black>=24.10.0; implementation_name == "cpython"',
     "ruff>=0.9.2",
     "codespell>=2.3.0",
     "mypy>=1.15.0",
+    "pre-commit>=4.2.0",
+    "attrs>=25.3.0",
 ]
 
 [project.urls]

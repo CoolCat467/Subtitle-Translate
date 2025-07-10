@@ -5,7 +5,7 @@
 from __future__ import annotations
 
 # Subtitle Parser - Parse subtitle files.
-# Copyright (C) 2024  CoolCat467
+# Copyright (C) 2024-2025  CoolCat467
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@ __license__ = "GNU General Public License Version 3"
 from typing import IO, TYPE_CHECKING, Final, NamedTuple
 
 from bs4 import BeautifulSoup
+from bs4.element import Tag
 
 if TYPE_CHECKING:
     from collections.abc import Generator, Iterable
@@ -248,6 +249,7 @@ def convert_text(
         soup = BeautifulSoup(html, "lxml")
         text: tuple[str, ...] = ()
         for tag in soup.find_all(text_tags):
+            assert isinstance(tag, Tag)
             string = tag.string
             if string is not None:
                 text += (str(tag.string),)
@@ -280,6 +282,7 @@ def modify_subtitles(
             new_text_data,
             strict=True,
         ):
+            assert isinstance(tag, Tag)
             if tag.string is None:
                 continue
             # Overwrite block text
