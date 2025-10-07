@@ -53,7 +53,7 @@ tests = [
 tools = [
     "ruff>=0.9.2",
     "codespell>=2.3.0",
-    "mypy>=1.15.0",
+    "mypy>=1.18.2",
     "pre-commit>=4.2.0",
     "attrs>=25.3.0",
 ]
@@ -73,6 +73,11 @@ package = true
 
 [tool.mypy]
 files = ["src/subtitle_translate/",]
+enable_error_code = [
+    "truthy-bool",
+    "mutable-override",
+    "exhaustive-match",
+]
 show_column_numbers = true
 show_error_codes = true
 show_traceback = true

@@ -4,7 +4,6 @@ set -ex
 
 ON_GITHUB_CI=true
 EXIT_STATUS=0
-PROJECT='subtitle_translate'
 
 # If not running on Github's CI, discard the summaries
 if [ -z "${GITHUB_STEP_SUMMARY+x}" ]; then
@@ -94,7 +93,7 @@ Problems were found by static analysis (listed above).
 To fix formatting and see remaining errors, run
 
     uv sync --extra tools
-    ruff check src/$PROJECT
+    ruff check src
     mypy
     ./check.sh
 

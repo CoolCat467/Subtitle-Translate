@@ -260,7 +260,7 @@ async def run_async() -> None:
     args = parser.parse_args()
 
     if args.source_type == "auto":
-        name, ext = args.source_file.rsplit(".", 1)
+        _name, ext = args.source_file.rsplit(".", 1)
         args.source_type = ext
 
     if args.source_type == "srt":
